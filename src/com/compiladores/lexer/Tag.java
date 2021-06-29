@@ -46,5 +46,6 @@ public class Tag {
             ID          =   287, // nome
             INT_CONST   =   288, // 123
             LIT_CONST   =   289, // "aaa"
-            REAL_CONST  =   290; // 12.4
+            REAL_CONST  =   290, // 12.4
+            FINAL_FILE  =   291; // final do arquivo
 }

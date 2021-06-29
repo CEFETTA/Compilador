@@ -110,6 +110,7 @@ public class Lexer {
             case ')': return Word.parCl;
             case '{': return Word.keyOp;
             case '}': return Word.keyCl;
+            case 65535: return Word.eof;
         }
 
         // Números
