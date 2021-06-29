@@ -40,17 +40,11 @@ public class Tag {
             PAR_CLO =   284, // ')'
             KEY_OP  =   285, // '{'
             KEY_CLO =   286, // '}'
+            NOT     =   296, // '!'
 
             // Outros Tokens
             ID          =   287, // nome
             INT_CONST   =   288, // 123
             LIT_CONST   =   289, // "aaa"
-            REAL_CONST  =   290, // 12.4
-
-            // delimitadores
-            SING_COM    =   291, // '//' comentário de uma linha
-            MUL_COM_OP  =   292, // '/*' início de multiplo comentário
-            MUL_COM_CLO =   293, // '*/' fim de multiplo comentário
-            TRUE        =   294, // 'true'
-            FALSE       =   295; // 'false'
+            REAL_CONST  =   290; // 12.4
 }
