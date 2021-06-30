@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.Scanner;
 
 public class Lexer {
     // contador de linhas
@@ -12,8 +11,6 @@ public class Lexer {
     // caracter atual do arquivo fonte
     private char ch = ' ';
     private FileReader file;
-
-    Scanner ssss = new Scanner(System.in);
 
     // Tabela de Símbolos
     private Hashtable words = new Hashtable();
