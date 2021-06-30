@@ -134,7 +134,7 @@ public class Lexer {
                     double real = 0.0;
                     int exp = 1;
                     do{
-                        real = real + Math.pow(Character.digit(ch, 10), exp);
+                        real = real + Character.digit(ch, 10)/Math.pow(10, exp);
                         exp++;
                         readch();
                     }while(Character.isDigit(ch));

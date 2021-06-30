@@ -3,15 +3,13 @@ package com.compiladores;
 import com.compiladores.lexer.Lexer;
 import com.compiladores.lexer.Tag;
 import com.compiladores.lexer.Token;
-import java.io.IOException;
 import java.util.Enumeration;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-        Token tok;
+    public static void main(String[] args) {
         try {
-            System.out.println(args[0]);
+            Token tok;
             Lexer analisadorLexico = new Lexer(args[0]);
 
             // exibe os lexemas
