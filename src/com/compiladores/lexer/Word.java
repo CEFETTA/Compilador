@@ -15,8 +15,8 @@ public class Word extends Token{
     public static final Word not = new Word("!", Tag.NOT);
     public static final Word eq = new Word("==", Tag.EQ);
     public static final Word ass = new Word("=", Tag.ASS);
-    public static final Word add = new Word("=", Tag.ADD);
-    public static final Word sub = new Word("=", Tag.SUB);
+    public static final Word add = new Word("+", Tag.ADD);
+    public static final Word sub = new Word("-", Tag.SUB);
     public static final Word semi = new Word(";", Tag.SEMCOL);
     public static final Word comm = new Word(",", Tag.COMM);
     public static final Word parOp = new Word("(", Tag.PAR_OP);

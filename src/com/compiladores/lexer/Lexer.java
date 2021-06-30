@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Scanner;
 
 public class Lexer {
     // contador de linhas
@@ -11,6 +12,8 @@ public class Lexer {
     // caracter atual do arquivo fonte
     private char ch = ' ';
     private FileReader file;
+
+    Scanner ssss = new Scanner(System.in);
 
     // Tabela de Símbolos
     private Hashtable words = new Hashtable();
@@ -59,9 +62,30 @@ public class Lexer {
 
     // retorna o próximo Token da Linguagem
     public Token scan() throws IOException {
-        // Desconsidera delimitadores na entrada
+        // Desconsidera delimitadores e comentários na entrada
         for(;; readch()){
             if(ch == ' ' || ch == '\t' || ch == '\r' || ch == '\b') continue;
+            else if(ch == '/'){
+                // comentário de uma linha
+                if(readch('/')){
+                    while (ch != '\n'){
+                        readch();
+                    }
+                }
+                // comentário de múltiplas linhas
+                else if(ch == '*'){
+                    char ant = ' ';
+                    while (!(ant == '*' && ch == '/') && ch != 65535){
+                        if(ch == '\n') line++;
+                        ant = ch;
+                        readch();
+                    }
+                    if(ch == 65535) return Word.eof;
+                }
+                // é apenas divisão
+                else return Word.div;
+                continue;
+            }
             else if(ch == '\n') line++; // conta linha
             else break;
         }
@@ -83,33 +107,18 @@ public class Lexer {
             case '=':
                 if(readch('=')) return Word.eq;
                 else return Word.ass;
-            case '+': return Word.add;
-            case '-': return Word.sub;
+            case '+': readch(); return Word.add;
+            case '-': readch(); return Word.sub;
             case '|':
                 if(readch('|')) return Word.or;
-                else return new Token('&');
-            case '*': return Word.mul;
-            case '/':
-                // comentário de uma linha
-                if(readch('/')) {
-                    while(this.ch != '\n')
-                        readch();
-                }
-                // comentário em múltiplas linhas
-                else if(readch('*')){
-                    char ant = ' ';
-                    while(!(ant == '*' && this.ch == '/')) {
-                        ant = this.ch;
-                        readch();
-                    }
-                }
-                else return Word.div;
-            case ';': return Word.semi;
-            case ',': return Word.comm;
-            case '(': return Word.parOp;
-            case ')': return Word.parCl;
-            case '{': return Word.keyOp;
-            case '}': return Word.keyCl;
+                else return new Token('|');
+            case '*': readch(); return Word.mul;
+            case ';': readch(); return Word.semi;
+            case ',': readch(); return Word.comm;
+            case '(': readch(); return Word.parOp;
+            case ')': readch(); return Word.parCl;
+            case '{': readch(); return Word.keyOp;
+            case '}': readch(); return Word.keyCl;
             case 65535: return Word.eof;
         }
 
@@ -139,16 +148,21 @@ public class Lexer {
         if(ch == '"'){
             StringBuffer sb = new StringBuffer();
             do{
-                sb.append(ch);
+                if(ch != '\n' && ch != '\''){
+                    sb.append(ch);
+                }
+                if(ch == '\n') line++;
                 readch();
             }while(ch != '"');
-
+            sb.append(ch);
             String s = sb.toString();
+            ch = ' ';
             return new Literal(s);
         }
 
         // Identificadores
         if(Character.isLetter(ch)){
+
             StringBuffer sb = new StringBuffer();
             do{
                 sb.append(ch);
@@ -165,7 +179,7 @@ public class Lexer {
 
         // Caracteres não especificados
         Token t = new Token(ch);
-        ch = ' ';
+        readch();
         return t;
     }
 }
