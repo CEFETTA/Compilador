@@ -13,7 +13,7 @@ public class Lexer {
     private FileReader file;
 
     // Tabela de Símbolos
-    private Hashtable words = new Hashtable();
+    public Hashtable words = new Hashtable();
 
     // Método que insere palavras reservados na TS
     void reserve(Word w){
@@ -58,21 +58,25 @@ public class Lexer {
     }
 
     // retorna o próximo Token da Linguagem
-    public Token scan() throws IOException {
+    public Token scan() throws Exception {
         // Desconsidera delimitadores e comentários na entrada
         for(;; readch()){
             if(ch == ' ' || ch == '\t' || ch == '\r' || ch == '\b') continue;
             else if(ch == '/'){
                 // comentário de uma linha
                 if(readch('/')){
-                    while (ch != '\n'){
+                    while (ch != '\n' && ch != 65535){
                         readch();
                     }
                 }
                 // comentário de múltiplas linhas
                 else if(ch == '*'){
                     char ant = ' ';
-                    while (!(ant == '*' && ch == '/') && ch != 65535){
+                    while (!(ant == '*' && ch == '/')){
+                        // final do arquivo
+                        if(ch == 65535){
+                            throw new Exception("Error: Comentário não finalizado!");
+                        }
                         if(ch == '\n') line++;
                         ant = ch;
                         readch();
@@ -121,22 +125,46 @@ public class Lexer {
 
         // Números
         if(Character.isDigit(ch)){
+            if(ch == '0'){
+                if(readch('.')){
+                    readch();
+                    if(!Character.isDigit(ch)){
+                        throw new Exception("Error: Contante 0. mal formatada!");
+                    }
+                    double real = 0.0;
+                    int exp = 1;
+                    do{
+                        real = real + Math.pow(Character.digit(ch, 10), exp);
+                        exp++;
+                        readch();
+                    }while(Character.isDigit(ch));
+
+                    return new Real(real);
+                }
+                return new Inteiro(Integer.parseInt("0"));
+            }
+
             int value = 0;
             do{
                 value = 10 * value + Character.digit(ch, 10);
                 readch();
-            }while(Character.isDigit(ch));
+            }while (Character.isDigit(ch));
 
             // inteiro
-            if(this.ch != '.') return new Inteiro(value);
+            if(ch != '.') return new Inteiro(value);
 
             //real
+            readch();
+            if(!Character.isDigit(ch)){
+                throw new Exception("Error: Real "+value+". mal formatado!");
+            }
             double real = (double) value;
-            int exp = 1; // expoente da base 10
+            int exp = 1;
             do{
-                real = real + Character.digit(ch, 10)/Math.pow(10,exp);
+                real = real + Character.digit(ch, 10)/Math.pow(10, exp);
+                exp++;
                 readch();
-            }while(Character.isDigit(ch));
+            }while (Character.isDigit(ch));
 
             return new Real(real);
         }
@@ -145,6 +173,9 @@ public class Lexer {
         if(ch == '"'){
             StringBuffer sb = new StringBuffer();
             do{
+                // fim do arquivo
+                if(ch == 65535)
+                    throw new Exception("Error: Literal não fechado!");
                 if(ch != '\n' && ch != '\''){
                     sb.append(ch);
                 }
@@ -153,7 +184,7 @@ public class Lexer {
             }while(ch != '"');
             sb.append(ch);
             String s = sb.toString();
-            ch = ' ';
+            readch();
             return new Literal(s);
         }
 
