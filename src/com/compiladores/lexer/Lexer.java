@@ -65,7 +65,7 @@ public class Lexer {
             else if(ch == '/'){
                 // comentário de uma linha
                 if(readch('/')){
-                    while (ch != '\n' && ch != 65535){
+                    while (ch != '\n' && ch != Tag.EOF){
                         readch();
                     }
                 }
@@ -74,14 +74,14 @@ public class Lexer {
                     char ant = ' ';
                     while (!(ant == '*' && ch == '/')){
                         // final do arquivo
-                        if(ch == 65535){
+                        if(ch == Tag.EOF){
                             throw new Exception("Error: Comentário não finalizado!");
                         }
                         if(ch == '\n') line++;
                         ant = ch;
                         readch();
                     }
-                    if(ch == 65535) return Word.eof;
+                    if(ch == Tag.EOF) return Word.eof;
                 }
                 // é apenas divisão
                 else return Word.div;
@@ -120,7 +120,7 @@ public class Lexer {
             case ')': readch(); return Word.parCl;
             case '{': readch(); return Word.keyOp;
             case '}': readch(); return Word.keyCl;
-            case 65535: return Word.eof;
+            case Tag.EOF: return Word.eof;
         }
 
         // Números
@@ -174,7 +174,7 @@ public class Lexer {
             StringBuffer sb = new StringBuffer();
             do{
                 // fim do arquivo
-                if(ch == 65535)
+                if(ch == Tag.EOF)
                     throw new Exception("Error: Literal não fechado!");
                 if(ch != '\n' && ch != '\'' && ch != '"'){
                     sb.append(ch);

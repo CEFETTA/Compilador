@@ -23,7 +23,7 @@ public class Word extends Token{
     public static final Word parCl = new Word(")", Tag.PAR_CLO);
     public static final Word keyOp = new Word("{", Tag.KEY_OP);
     public static final Word keyCl = new Word("}", Tag.KEY_CLO);
-    public static final Word eof = new Word("", Tag.FINAL_FILE);
+    public static final Word eof = new Word("", Tag.EOF);
 
 
     public Word(String s, int tag){

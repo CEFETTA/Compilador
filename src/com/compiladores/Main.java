@@ -17,7 +17,7 @@ public class Main {
             do{
                 tok = analisadorLexico.scan();
                 System.out.println("Lexema: "+tok.toString()+" - Tag: "+tok.tag);
-            }while(tok.tag != Tag.FINAL_FILE);
+            }while(tok.tag != Tag.EOF);
 
             // Tabela de Símbolos
             System.out.println("--------- TS ---------");
