@@ -75,7 +75,7 @@ public class Lexer {
                     while (!(ant == '*' && ch == '/')){
                         // final do arquivo
                         if(ch == Tag.EOF){
-                            throw new Exception("Error: Comentário não finalizado!");
+                            throw new Exception("Error: Linha: "+line+". Múltiplo comentário não fechado!");
                         }
                         if(ch == '\n') line++;
                         ant = ch;
@@ -129,7 +129,7 @@ public class Lexer {
                 if(readch('.')){
                     readch();
                     if(!Character.isDigit(ch)){
-                        throw new Exception("Error: Contante 0. mal formatada!");
+                        throw new Exception("Error: Linha: "+line+". Contante 0. mal formatada!");
                     }
                     double real = 0.0;
                     int exp = 1;
@@ -156,7 +156,7 @@ public class Lexer {
             //real
             readch();
             if(!Character.isDigit(ch)){
-                throw new Exception("Error: Real "+value+". mal formatado!");
+                throw new Exception("Error: Linha: "+line+". Real "+value+". mal formatado!");
             }
             double real = (double) value;
             int exp = 1;
@@ -175,7 +175,7 @@ public class Lexer {
             do{
                 // fim do arquivo
                 if(ch == Tag.EOF)
-                    throw new Exception("Error: Literal não fechado!");
+                    throw new Exception("Error: Linha: "+line+". Literal não fechado!");
                 if(ch != '\n' && ch != '\'' && ch != '"'){
                     sb.append(ch);
                 }
