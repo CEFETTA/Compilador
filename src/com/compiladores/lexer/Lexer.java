@@ -176,13 +176,12 @@ public class Lexer {
                 // fim do arquivo
                 if(ch == 65535)
                     throw new Exception("Error: Literal não fechado!");
-                if(ch != '\n' && ch != '\''){
+                if(ch != '\n' && ch != '\'' && ch != '"'){
                     sb.append(ch);
                 }
                 if(ch == '\n') line++;
                 readch();
             }while(ch != '"');
-            sb.append(ch);
             String s = sb.toString();
             readch();
             return new Literal(s);
