@@ -1,0 +1,25 @@
+class Teste6
+
+/** Verificando fluxo de controle
+Programa com while aninhados **/
+
+int i, j, valor, qtd;
+
+init
+    valor = 0;
+    write("Quantos vezes (ao quadrado) deseja rodar?" );
+    read(qtd);
+    i = 0;
+
+    do {
+        j = 0;
+        do {
+            valor = j * 5;
+            j = j + 1;
+        }while(j < qtd);
+        i = i + 1;
+    }while(i < qtd);
+
+    write("O calculo resultou em: ");
+    write(valor);
+stop
