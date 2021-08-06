@@ -1,11 +1,7 @@
-package com.compiladores;
+package com.compilador;
 
-import com.compiladores.lexer.Lexer;
-import com.compiladores.lexer.Tag;
-import com.compiladores.lexer.Token;
-import com.compiladores.parser.Parser;
-
-import java.util.Enumeration;
+import com.compilador.lexer.Lexer;
+import com.compilador.parser.Parser;
 
 public class Main {
 

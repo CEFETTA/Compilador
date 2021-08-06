@@ -1,4 +1,4 @@
-package com.compiladores.lexer;
+package com.compilador.lexer;
 
 public class Real extends Token{
     public final double value;

@@ -1,8 +1,8 @@
-package com.compiladores.parser;
+package com.compilador.parser;
 
-import com.compiladores.lexer.Lexer;
-import com.compiladores.lexer.Tag;
-import com.compiladores.lexer.Token;
+import com.compilador.lexer.Lexer;
+import com.compilador.lexer.Tag;
+import com.compilador.lexer.Token;
 
 public class Parser {
     // analisador léxico

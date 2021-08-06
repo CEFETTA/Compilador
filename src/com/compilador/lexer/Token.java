@@ -1,4 +1,4 @@
-package com.compiladores.lexer;
+package com.compilador.lexer;
 
 public class Token {
     public final int tag;

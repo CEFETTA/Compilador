@@ -1,4 +1,4 @@
-package com.compiladores.lexer;
+package com.compilador.lexer;
 
 /*
 * Classe que define as constantes para os tokens

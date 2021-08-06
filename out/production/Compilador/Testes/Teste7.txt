@@ -1,0 +1,11 @@
+classe Teste7
+
+int num;
+
+init
+    write("Digite o valor desejado: ");
+    read(num);
+
+    write("O valor digitado foi: ");
+    read(stop);
+stop

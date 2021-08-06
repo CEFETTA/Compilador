@@ -1,4 +1,4 @@
-package com.compiladores.lexer;
+package com.compilador.lexer;
 
 public class Word extends Token{
     public String lexeme = "";
