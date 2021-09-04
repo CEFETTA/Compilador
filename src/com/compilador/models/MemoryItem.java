@@ -6,6 +6,6 @@ public class MemoryItem {
 
     public MemoryItem(Id identifier){
         this.identifier = identifier;
-        this.value = new Const(0, identifier.type);
+        this.value = new Const(0, identifier.typeTag);
     }
 }

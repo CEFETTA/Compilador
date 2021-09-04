@@ -131,22 +131,22 @@ public class Parser {
             case Tag.INT:
             case Tag.STRING:
             case Tag.FLOAT:
-                Token previous = this.tok;
+                Token typeToken = this.tok;
                 this.type();
-                this.identList(previous);
+                this.identList(typeToken);
                 break;
             default: this.error("decl");
         }
     }
 
     // Símbolo: ident-list
-    void identList(Token t) throws Exception {
+    void identList(Token typeToken) throws Exception {
         String rule = "ident-list";
         // ident-list -> identifier ident-list-prime
         if(this.tok.tag == Tag.ID){
-            this.sem.addId(new Id(((Word) this.tok).lexeme, t.tag);
+            this.sem.addId(new Id(((Word) this.tok).lexeme, typeToken.tag));
             this.eat(Tag.ID, rule);
-            this.identListPrime();
+            this.identListPrime(typeToken);
         }
         else {
             this.error(rule);
@@ -154,14 +154,15 @@ public class Parser {
     }
 
     // Símbolo: ident-list-prime
-    void identListPrime() throws  Exception {
+    void identListPrime(Token typeToken) throws  Exception {
         String rule = "ident-list-prime";
         switch (this.tok.tag) {
             // ident-list-prime	-> "," identifier ident-list-prime
             case Tag.COMM:
                 this.eat(Tag.COMM, rule);
+                this.sem.addId(new Id(((Word) this.tok).lexeme, typeToken.tag));
                 this.eat(Tag.ID, rule);
-                this.identListPrime();
+                this.identListPrime(typeToken);
                 break;
             // ident-list-prime -> λ
             case Tag.SEMCOL: break;
@@ -579,6 +580,7 @@ public class Parser {
         switch (this.tok.tag) {
             // factor -> identifier
             case Tag.ID:
+                this.sem.getValue(this.asLexeme(this.tok));
                 this.eat(Tag.ID, rule);
                 break;
             // factor -> constant
@@ -644,5 +646,9 @@ public class Parser {
             case Tag.AND: this.eat(Tag.AND, rule); break;
             default: this.error(rule);
         }
+    }
+
+    String asLexeme(Token tok) {
+        return ((Word) tok).lexeme;
     }
 }

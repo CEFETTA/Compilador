@@ -2,10 +2,10 @@ package com.compilador.models;
 
 public class Const {
     public Object value;
-    public Type type;
+    public int typeTag;
 
-    public Const(Object value, Type type) {
+    public Const(Object value, int typeTag) {
         this.value = value;
-        this.type = type;
+        this.typeTag = typeTag;
     }
 }

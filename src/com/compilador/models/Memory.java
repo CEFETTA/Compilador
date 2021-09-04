@@ -17,8 +17,8 @@ public class Memory {
         this.memory.put(identifier.name, new MemoryItem(identifier));
     }
 
-    public Type getType(String id){
-        return memory.get(id).identifier.type;
+    public int getType(String id){
+        return memory.get(id).identifier.typeTag;
     }
 
     public Const getValue(String id){
