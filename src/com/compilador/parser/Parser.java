@@ -3,28 +3,37 @@ package com.compilador.parser;
 import com.compilador.lexer.Lexer;
 import com.compilador.lexer.Tag;
 import com.compilador.lexer.Token;
+import com.compilador.lexer.Word;
+import com.compilador.models.Id;
+import com.compilador.semantic.Semantic;
 
 public class Parser {
     // analisador léxico
     private Lexer lex;
     // token atual
     private Token tok;
+    // analisador Semântico
+    private Semantic sem;
 
     // método do construtor
     public Parser(Lexer l) throws Exception {
         this.lex = l;
+        this.sem = new Semantic(lex);
         this.S();
     }
 
     // avança na análise
-    void advance() throws Exception {
+    Token advance() throws Exception {
+        Token previous = this.tok;
         this.tok = lex.scan();
+        return previous;
     }
 
     // verifica a tag
-    void eat(int t, String rule) throws Exception{
-        if(tok.tag == t) this.advance();
+    Token eat(int t, String rule) throws Exception{
+        if(tok.tag == t) return this.advance();
         else error(rule);
+        return null;
     }
 
     // exibe o erro
@@ -122,18 +131,20 @@ public class Parser {
             case Tag.INT:
             case Tag.STRING:
             case Tag.FLOAT:
+                Token previous = this.tok;
                 this.type();
-                this.identList();
+                this.identList(previous);
                 break;
             default: this.error("decl");
         }
     }
 
     // Símbolo: ident-list
-    void identList() throws Exception {
+    void identList(Token t) throws Exception {
         String rule = "ident-list";
         // ident-list -> identifier ident-list-prime
         if(this.tok.tag == Tag.ID){
+            this.sem.addId(new Id(((Word) this.tok).lexeme, t.tag);
             this.eat(Tag.ID, rule);
             this.identListPrime();
         }
