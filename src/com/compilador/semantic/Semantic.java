@@ -5,6 +5,7 @@ import com.compilador.lexer.Tag;
 import com.compilador.models.Const;
 import com.compilador.models.Id;
 import com.compilador.models.Memory;
+import com.compilador.models.Type;
 
 public class Semantic {
     private Lexer lex;
@@ -15,13 +16,17 @@ public class Semantic {
         this.memory = new Memory();
     }
 
+    public void error(String rule) {
+        System.out.println("Erro Semântico: " + rule);
+        System.exit(1);
+    }
+
     public void addId(Id identifier) throws Exception {
         if(!memory.hasId(identifier.name)){
             memory.addItem(identifier);
         }
         else {
-            System.out.println("Erro Semântico: Identificador '"+identifier.name+"' já foi declarado");
-            System.exit(1);
+            this.error("Identificador '"+identifier.name+"' já foi declarado");
         }
     }
 
@@ -29,84 +34,84 @@ public class Semantic {
         if(memory.hasId(id)){
             return memory.getValue(id);
         }
-        System.out.println("Erro Semântico: Identificador '"+id+"' não foi declarado");
-        System.exit(1);
+        this.error("Identificador '"+id+"' não foi declarado");
         return null;
+    }
+
+    public Type getIdentifierType(String id) {
+        Const value = this.getValue(id);
+        return value.type;
     }
 
     // !
     public Const opNot(Const c){
-        if(c.typeTag == Tag.INT){
+        if(c.type == Type.INT){
             Integer value = c.value == Integer.valueOf(0) ? 1 : 0;
-            return new Const(value, c.typeTag);
+            return new Const(value, c.type);
         }
 
-        System.out.println("Erro Semântico: Só é possível utilizar o operador de negação em expressões inteiras (0=false; 1=true)!");
-        System.exit(1);
+        this.error("Só é possível utilizar o operador de negação em expressões inteiras (0=false; 1=true)!");
         return null;
     }
 
     // -
     public Const opMinus(Const c){
-        if(c.typeTag == Tag.INT){
-            return new Const(-((int) c.value), c.typeTag);
+        if(c.type == Type.INT){
+            return new Const(-((int) c.value), c.type);
         }
-        if(c.typeTag == Tag.FLOAT){
-            return new Const(-((float) c.value), c.typeTag);
+        if(c.type == Type.FLOAT){
+            return new Const(-((float) c.value), c.type);
         }
-        System.out.println("Erro Semântico: Só é possível utilizar o operador de menos em inteiros ou reais!");
-        System.exit(1);
+        this.error("Só é possível utilizar o operador de menos em inteiros ou reais!");
         return null;
     }
 
     // mulop
     public Const opMulop(Const factor, Const mulfactor, int t){
-        if(factor.typeTag == mulfactor.typeTag){
+        if(factor.type == mulfactor.type){
             if(!isNumber(factor)){
-                System.out.println("Erro Semântico: Operador válido apenas para números!");
-                System.exit(1);
+                this.error("Operador válido apenas para números!");
             }
 
-            return new Const(factor.value, factor.typeTag);
+            return new Const(factor.value, factor.type);
         }
 
-        System.out.println("Erro Semântico: não foi possível executar a operação "+t+" com ' "+factor.typeTag+" and "+mulfactor.typeTag+"'!");
-        System.exit(1);
+        this.error("não foi possível executar a operação "+t+" com ' "+factor.type +" and "+mulfactor.type +"'!");
         return null;
     }
 
     public Const opSimpleExpr(Const term, Const addTerm, int t){
-        if(term.typeTag == addTerm.typeTag){
-            if(term.typeTag == Tag.STRING && t != Tag.ADD){
-                System.out.println("Erro Semântico: string não é compatível com o operador!");
-                System.exit(1);
+        if(term.type == addTerm.type){
+            if(term.type == Type.STRING && t != Tag.ADD){
+                this.error("string não é compatível com o operador!");
             }
             if(!isNumber(term) && t != Tag.SUB){
-                System.out.println("Erro Semântico: Operador válido apenas para números!");
-                System.exit(1);
+                this.error("Operador válido apenas para números!");
             }
 
-            return new Const(term.value, term.typeTag);
+            return new Const(term.value, term.type);
         }
 
-        System.out.println("Erro Semântico: não foi possível executar a operação "+t+" com ' "+addTerm.typeTag+" and "+term.typeTag+"'!");
-        System.exit(1);
+        this.error("não foi possível executar a operação "+t+" com ' "+addTerm.type +" and "+term.type +"'!");
         return null;
     }
 
     public Const opRelop(Const expression, Const operationExp, int t){
         if(
-                expression.typeTag == operationExp.typeTag
-                || expression.typeTag == Tag.FLOAT && isNumber(operationExp)
+                expression.type == operationExp.type
+                || expression.type == Type.FLOAT && isNumber(operationExp)
         ){
-            return new Const(expression.value, expression.typeTag);
+            return new Const(expression.value, expression.type);
         }
-        System.out.println("Erro Semântico: não foi possível executar a operação "+t+" com ' "+expression.typeTag+" and "+operationExp.typeTag+"', são tipos diferentes!");
-        System.exit(1);
+        this.error("não foi possível executar a operação \"+t+\" com ' \"+expression.type +\" and \"+operationExp.type +\"', são tipos diferentes!\"");
         return null;
     }
 
+    public void checkIsTypeCompatible(Type assignedType, Type expressionType) {
+        // TODO: Check if type can be converted
+    }
+
     private static boolean isNumber(Const c){
-        return  c.typeTag == Tag.FLOAT || c.typeTag == Tag.INT;
+        return  c.type == Type.FLOAT || c.type == Type.INT;
     }
 }

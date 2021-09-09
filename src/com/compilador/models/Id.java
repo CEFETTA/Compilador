@@ -2,10 +2,10 @@ package com.compilador.models;
 
 public class Id {
     public String name;
-    public int typeTag;
+    public Type type;
 
-    public Id(String name, int typeTag){
+    public Id(String name, Type type){
         this.name = name;
-        this.typeTag = typeTag;
+        this.type = type;
     }
 }

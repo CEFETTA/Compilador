@@ -5,6 +5,7 @@ import com.compilador.lexer.Tag;
 import com.compilador.lexer.Token;
 import com.compilador.lexer.Word;
 import com.compilador.models.Id;
+import com.compilador.models.Type;
 import com.compilador.semantic.Semantic;
 
 public class Parser {
@@ -131,22 +132,21 @@ public class Parser {
             case Tag.INT:
             case Tag.STRING:
             case Tag.FLOAT:
-                Token typeToken = this.tok;
-                this.type();
-                this.identList(typeToken);
+                Type identifierType = this.type();
+                this.identList(identifierType);
                 break;
             default: this.error("decl");
         }
     }
 
     // Símbolo: ident-list
-    void identList(Token typeToken) throws Exception {
+    void identList(Type identifierType) throws Exception {
         String rule = "ident-list";
         // ident-list -> identifier ident-list-prime
         if(this.tok.tag == Tag.ID){
-            this.sem.addId(new Id(((Word) this.tok).lexeme, typeToken.tag));
+            this.sem.addId(new Id(((Word) this.tok).lexeme, identifierType));
             this.eat(Tag.ID, rule);
-            this.identListPrime(typeToken);
+            this.identListPrime(identifierType);
         }
         else {
             this.error(rule);
@@ -154,15 +154,15 @@ public class Parser {
     }
 
     // Símbolo: ident-list-prime
-    void identListPrime(Token typeToken) throws  Exception {
+    void identListPrime(Type identifierType) throws  Exception {
         String rule = "ident-list-prime";
         switch (this.tok.tag) {
             // ident-list-prime	-> "," identifier ident-list-prime
             case Tag.COMM:
                 this.eat(Tag.COMM, rule);
-                this.sem.addId(new Id(((Word) this.tok).lexeme, typeToken.tag));
+                this.sem.addId(new Id(((Word) this.tok).lexeme, identifierType));
                 this.eat(Tag.ID, rule);
-                this.identListPrime(typeToken);
+                this.identListPrime(identifierType);
                 break;
             // ident-list-prime -> λ
             case Tag.SEMCOL: break;
@@ -171,18 +171,25 @@ public class Parser {
     }
 
     // Símbolo: type
-    void type() throws Exception {
+    Type type() throws Exception {
         String rule = "type";
 
         switch (this.tok.tag) {
             // type	-> int
-            case Tag.INT: this.eat(Tag.INT, rule); break;
+            case Tag.INT:
+                this.eat(Tag.INT, rule);
+                return Type.INT;
             // type	-> string
-            case Tag.STRING: this.eat(Tag.STRING, rule); break;
+            case Tag.STRING:
+                this.eat(Tag.STRING, rule);
+                return Type.STRING;
             // type	-> float
-            case Tag.FLOAT: this.eat(Tag.FLOAT, rule); break;
+            case Tag.FLOAT:
+                this.eat(Tag.FLOAT, rule);
+                return Type.FLOAT;
             default: this.error(rule);
         }
+        return Type.ERR;
     }
 
     // Símbolo: body
@@ -262,9 +269,10 @@ public class Parser {
         String rule = "assign-stmt";
         // assign-stmt -> identifier "=" simple-expr
         if(this.tok.tag == Tag.ID){
+            Type expectedType = this.sem.getIdentifierType(this.asLexeme(this.tok));
             this.eat(Tag.ID, rule);
             this.eat(Tag.ASS, rule);
-            this.simpleExpr();
+            this.simpleExpr(expectedType);
         }
         else {
             this.error(rule);
@@ -450,7 +458,7 @@ public class Parser {
     }
 
     // Símbolo: simple-expr
-    void simpleExpr() throws Exception {
+    void simpleExpr(Type expectedType) throws Exception {
         String rule = "simple-expr";
 
         switch (this.tok.tag) {
@@ -462,15 +470,15 @@ public class Parser {
             case Tag.INT_CONST:
             case Tag.LIT_CONST:
             case Tag.REAL_CONST:
-                this.term();
-                this.simpleExprPrime();
+                this.term(expectedType);
+                this.simpleExprPrime(expectedType);
                 break;
             default: this.error(rule);
         }
     }
 
     // Símbolo: simple-expr-prime
-    void simpleExprPrime() throws Exception {
+    void simpleExprPrime(Type expectedType) throws Exception {
         String rule = "simple-expr-prime";
 
         switch (this.tok.tag) {
@@ -479,8 +487,8 @@ public class Parser {
             case Tag.ADD:
             case Tag.OR:
                 this.addop();
-                this.term();
-                this.simpleExprPrime();
+                this.term(expectedType);
+                this.simpleExprPrime(expectedType);
                 break;
             // simple-expr-prime	-> λ
             case Tag.SEMCOL:
@@ -497,7 +505,7 @@ public class Parser {
     }
 
     // Símbolo: term
-    void term() throws Exception {
+    void term(Type expectedType) throws Exception {
         String rule = "term";
 
         switch (this.tok.tag) {
@@ -509,15 +517,15 @@ public class Parser {
             case Tag.INT_CONST:
             case Tag.REAL_CONST:
             case Tag.LIT_CONST:
-                this.factorA();
-                this.termPrime();
+                this.factorA(expectedType);
+                this.termPrime(expectedType);
                 break;
             default: this.error(rule);
         }
     }
 
     // Símbolo: term-prime
-    void termPrime() throws Exception {
+    void termPrime(Type expectedType) throws Exception {
         String rule = "term-prime";
 
         switch (this.tok.tag) {
@@ -526,8 +534,8 @@ public class Parser {
             case Tag.DIV:
             case Tag.AND:
                 this.mulop();
-                this.factorA();
-                this.termPrime();
+                this.factorA(expectedType);
+                this.termPrime(expectedType);
                 break;
             // term-prime -> λ
             case Tag.SEMCOL:
@@ -547,7 +555,7 @@ public class Parser {
     }
 
     // Símbolo: factor-a
-    void factorA() throws Exception {
+    void factorA(Type expectedType) throws Exception {
         String rule = "factor-a";
 
         switch (this.tok.tag) {
@@ -557,40 +565,50 @@ public class Parser {
             case Tag.REAL_CONST:
             case Tag.INT_CONST:
             case Tag.LIT_CONST:
-                this.factor();
+                this.factor(expectedType);
                 break;
             // factor-a -> "!" factor
             case Tag.NOT:
                 this.eat(Tag.NOT, rule);
-                this.factor();
+                this.factor(expectedType);
                 break;
             // factor-a -> "-" factor
             case Tag.SUB:
                 this.eat(Tag.SUB, rule);
-                this.factor();
+                this.factor(expectedType);
                 break;
             default: this.error(rule);
         }
     }
 
     // Símbolo: factor
-    void factor() throws Exception {
+    void factor(Type expectedType) throws Exception {
         String rule = "factor";
 
         switch (this.tok.tag) {
             // factor -> identifier
             case Tag.ID:
+                Type idType = this.sem.getIdentifierType(this.asLexeme(this.tok));
                 this.sem.getValue(this.asLexeme(this.tok));
                 this.eat(Tag.ID, rule);
                 break;
             // factor -> constant
-            case Tag.INT_CONST: this.eat(Tag.INT_CONST, rule); break;
-            case Tag.LIT_CONST: this.eat(Tag.LIT_CONST, rule); break;
-            case Tag.REAL_CONST: this.eat(Tag.REAL_CONST, rule); break;
+            case Tag.INT_CONST:
+                this.sem.checkIsTypeCompatible(expectedType, this.convertTokenToType(this.tok));
+                this.eat(Tag.INT_CONST, rule);
+                break;
+            case Tag.LIT_CONST:
+                this.sem.checkIsTypeCompatible(expectedType, this.convertTokenToType(this.tok));
+                this.eat(Tag.LIT_CONST, rule);
+                break;
+            case Tag.REAL_CONST:
+                this.sem.checkIsTypeCompatible(expectedType, this.convertTokenToType(this.tok));
+                this.eat(Tag.REAL_CONST, rule);
+                break;
             // factor -> "(" expression ")"
             case Tag.PAR_OP:
                 this.eat(Tag.PAR_OP, rule);
-                this.expression();
+                this.expression(expectedType);
                 this.eat(Tag.PAR_CLO, rule);
                 break;
             default: this.error(rule);
@@ -650,5 +668,16 @@ public class Parser {
 
     String asLexeme(Token tok) {
         return ((Word) tok).lexeme;
+    }
+
+    Type convertTokenToType(Token tok) {
+        switch (tok.tag) {
+            case Tag.INT_CONST:
+                return Type.INT;
+            case Tag.REAL_CONST:
+                return Type.FLOAT;
+            case Tag.LIT_CONST:
+                return Type.STRING;
+        }
     }
 }
