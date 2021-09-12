@@ -48,70 +48,6 @@ public class Semantic {
         this.checkIsTypeCompatible(expectedType, idType);
     }
 
-    // !
-    public Const opNot(Const c){
-        if(c.type == Type.INT){
-            Integer value = c.value == Integer.valueOf(0) ? 1 : 0;
-            return new Const(value, c.type);
-        }
-
-        this.error("Só é possível utilizar o operador de negação em expressões inteiras (0=false; 1=true)!");
-        return null;
-    }
-
-    // -
-    public Const opMinus(Const c){
-        if(c.type == Type.INT){
-            return new Const(-((int) c.value), c.type);
-        }
-        if(c.type == Type.FLOAT){
-            return new Const(-((float) c.value), c.type);
-        }
-        this.error("Só é possível utilizar o operador de menos em inteiros ou reais!");
-        return null;
-    }
-
-    // mulop
-    public Const opMulop(Const factor, Const mulfactor, int t){
-        if(factor.type == mulfactor.type){
-            if(!isNumber(factor)){
-                this.error("Operador válido apenas para números!");
-            }
-
-            return new Const(factor.value, factor.type);
-        }
-
-        this.error("não foi possível executar a operação "+t+" com ' "+factor.type +" and "+mulfactor.type +"'!");
-        return null;
-    }
-
-    public Const opSimpleExpr(Const term, Const addTerm, int t){
-        if(term.type == addTerm.type){
-            if(term.type == Type.STRING && t != Tag.ADD){
-                this.error("string não é compatível com o operador!");
-            }
-            if(!isNumber(term) && t != Tag.SUB){
-                this.error("Operador válido apenas para números!");
-            }
-
-            return new Const(term.value, term.type);
-        }
-
-        this.error("não foi possível executar a operação "+t+" com ' "+addTerm.type +" and "+term.type +"'!");
-        return null;
-    }
-
-    public Const opRelop(Const expression, Const operationExp, int t){
-        if(
-                expression.type == operationExp.type
-                || expression.type == Type.FLOAT && isNumber(operationExp)
-        ){
-            return new Const(expression.value, expression.type);
-        }
-        this.error("não foi possível executar a operação "+ t +" com '"+ expression.type +" e "+operationExp.type +"', são tipos diferentes!");
-        return null;
-    }
-
     public void checkIsTypeCompatible(Type assignedType, Type expressionType) {
         if (
                 assignedType == Type.ANY
@@ -124,9 +60,5 @@ public class Semantic {
             return;
         }
         this.error("O tipo utilizado na operação " + expressionType + " não é compatível com o tipo da atribuição " + assignedType);
-    }
-
-    private static boolean isNumber(Const c){
-        return  c.type == Type.FLOAT || c.type == Type.INT;
     }
 }
