@@ -10,9 +10,9 @@ public class Main {
             Lexer analisadorLexico = new Lexer(args[0]);
             Parser analisadorSintatico = new Parser(analisadorLexico);
 
-            System.out.println("Programa sintaticamente correto!");
+            System.out.println("Programa correto!");
         }catch (Exception e){
-            System.out.println("Programa com erro sintático!");
+            System.out.println("Programa com erro de compilação!");
             System.out.println(e.toString());
         }
     }

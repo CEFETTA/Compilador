@@ -17,7 +17,7 @@ public class Semantic {
     }
 
     public void error(String rule) {
-        System.out.println("Erro Semântico: " + rule);
+        System.out.println("Erro Semântico (linha "+ this.lex.line +"): " + rule + "\ndetalhes: " + this.lex.lineDetails);
         System.exit(1);
     }
 
@@ -41,6 +41,11 @@ public class Semantic {
     public Type getIdentifierType(String id) {
         Const value = this.getValue(id);
         return value.type;
+    }
+
+    public void checkIdentifierCompatibility(String id, Type expectedType) {
+        Type idType = this.getIdentifierType(id);
+        this.checkIsTypeCompatible(expectedType, idType);
     }
 
     // !
@@ -103,12 +108,22 @@ public class Semantic {
         ){
             return new Const(expression.value, expression.type);
         }
-        this.error("não foi possível executar a operação \"+t+\" com ' \"+expression.type +\" and \"+operationExp.type +\"', são tipos diferentes!\"");
+        this.error("não foi possível executar a operação "+ t +" com '"+ expression.type +" e "+operationExp.type +"', são tipos diferentes!");
         return null;
     }
 
     public void checkIsTypeCompatible(Type assignedType, Type expressionType) {
-        // TODO: Check if type can be converted
+        if (
+                assignedType == Type.ANY
+                || expressionType == Type.ANY
+                || assignedType == expressionType
+        ) {
+            return;
+        }
+        if (assignedType == Type.FLOAT && expressionType == Type.INT) {
+            return;
+        }
+        this.error("O tipo utilizado na operação " + expressionType + " não é compatível com o tipo da atribuição " + assignedType);
     }
 
     private static boolean isNumber(Const c){

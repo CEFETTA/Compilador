@@ -5,5 +5,6 @@ public enum Type {
     FLOAT,
     STRING,
     BOOL,
-    ERR
+    ERR,
+    ANY
 }

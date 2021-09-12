@@ -1,0 +1,12 @@
+class Teste8
+
+int integer;
+float floating;
+string text;
+
+init
+    //integer = floating; // ERRO: FLOAT não compatível com INT
+    //floating = text; // ERRO: STRING não compatível com FLOAT
+    //text = integer; // ERRO: INT não compatível com STRING
+    //integer = integer && integer; // ERRO: BOOL utilizado na operação com é compatível com INT
+stop

@@ -39,7 +39,7 @@ public class Parser {
 
     // exibe o erro
     void error(String rule) throws Exception {
-        throw new Exception("Error: Regra: "+rule+" na linha: "+this.lex.line);
+        throw new Exception("Error: Regra: "+rule+" na linha: "+this.lex.line + "\ndetalhes: " + this.lex.lineDetails);
     }
 
     // primeiro símbolo: S
@@ -328,7 +328,7 @@ public class Parser {
             case Tag.LIT_CONST:
             case Tag.REAL_CONST:
             case Tag.INT_CONST:
-                this.expression();
+                this.expression(Type.BOOL);
                 break;
             default: this.error("condition");
         }
@@ -410,14 +410,14 @@ public class Parser {
             case Tag.INT_CONST:
             case Tag.LIT_CONST:
             case Tag.REAL_CONST:
-                this.simpleExpr();
+                this.simpleExpr(Type.ANY);
                 break;
             default: this.error(rule);
         }
     }
 
     // Símbolo: expression
-    void expression() throws Exception {
+    void expression(Type expectedType) throws Exception {
         String rule = "expression";
 
         switch (this.tok.tag) {
@@ -429,15 +429,20 @@ public class Parser {
             case Tag.INT_CONST:
             case Tag.LIT_CONST:
             case Tag.REAL_CONST:
-                this.simpleExpr();
-                this.expressionPrime();
+                if (expectedType == Type.BOOL) {
+                    this.simpleExpr(Type.ANY);
+                    this.expressionPrime(expectedType);
+                } else {
+                    this.simpleExpr(expectedType);
+                    this.expressionPrime(expectedType);
+                }
                 break;
             default: this.error(rule);
         }
     }
 
     // Símbolo: expression-prime
-    void expressionPrime() throws Exception {
+    void expressionPrime(Type expectedType) throws Exception {
         String rule = "expression-prime";
 
         switch (this.tok.tag) {
@@ -448,8 +453,10 @@ public class Parser {
             case Tag.LTE:
             case Tag.DIF:
             case Tag.EQ:
+                // Relop expressions can only be used when boolean compatible
+                this.sem.checkIsTypeCompatible(expectedType, Type.BOOL);
                 this.relop();
-                this.simpleExpr();
+                this.simpleExpr(Type.ANY);
                 break;
             //expression-prime -> λ
             case Tag.PAR_CLO: break;
@@ -486,7 +493,7 @@ public class Parser {
             case Tag.SUB:
             case Tag.ADD:
             case Tag.OR:
-                this.addop();
+                this.addop(expectedType);
                 this.term(expectedType);
                 this.simpleExprPrime(expectedType);
                 break;
@@ -533,7 +540,7 @@ public class Parser {
             case Tag.MUL:
             case Tag.DIV:
             case Tag.AND:
-                this.mulop();
+                this.mulop(expectedType);
                 this.factorA(expectedType);
                 this.termPrime(expectedType);
                 break;
@@ -569,6 +576,8 @@ public class Parser {
                 break;
             // factor-a -> "!" factor
             case Tag.NOT:
+                // Not should be used only if expected type is compatible to boolean
+                this.sem.checkIsTypeCompatible(expectedType, Type.BOOL);
                 this.eat(Tag.NOT, rule);
                 this.factor(expectedType);
                 break;
@@ -588,8 +597,7 @@ public class Parser {
         switch (this.tok.tag) {
             // factor -> identifier
             case Tag.ID:
-                Type idType = this.sem.getIdentifierType(this.asLexeme(this.tok));
-                this.sem.getValue(this.asLexeme(this.tok));
+                this.sem.checkIdentifierCompatibility(asLexeme(this.tok), expectedType);
                 this.eat(Tag.ID, rule);
                 break;
             // factor -> constant
@@ -637,7 +645,7 @@ public class Parser {
     }
 
     // Símbolo: addop
-    void addop() throws Exception {
+    void addop(Type expectedType) throws Exception {
         String rule = "addop";
 
         switch (this.tok.tag) {
@@ -646,22 +654,29 @@ public class Parser {
             // addop -> "-"
             case Tag.SUB: this.eat(Tag.SUB, rule); break;
             // addop -> "||"
-            case Tag.OR: this.eat(Tag.OR, rule); break;
+            case Tag.OR:
+                this.sem.checkIsTypeCompatible(expectedType, Type.BOOL);
+                this.eat(Tag.OR, rule); break;
             default: this.error(rule);
         }
     }
 
     // Símbolo: mulop
-    void mulop() throws Exception {
+    void mulop(Type expectedType) throws Exception {
         String rule = "mulop";
 
         switch (this.tok.tag) {
             // mulop -> "*"
             case Tag.MUL: this.eat(Tag.MUL, rule); break;
             // mulop -> "/"
-            case Tag.DIV: this.eat(Tag.DIV, rule); break;
+            case Tag.DIV:
+                // div operator always casts return type to float
+                this.sem.checkIsTypeCompatible(expectedType, Type.FLOAT);
+                this.eat(Tag.DIV, rule); break;
             // mulop -> "&&"
-            case Tag.AND: this.eat(Tag.AND, rule); break;
+            case Tag.AND:
+                this.sem.checkIsTypeCompatible(expectedType, Type.BOOL);
+                this.eat(Tag.AND, rule); break;
             default: this.error(rule);
         }
     }
@@ -679,5 +694,6 @@ public class Parser {
             case Tag.LIT_CONST:
                 return Type.STRING;
         }
+        return Type.ERR;
     }
 }
