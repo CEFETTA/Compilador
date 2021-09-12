@@ -8,6 +8,7 @@ import java.util.Hashtable;
 public class Lexer {
     // contador de linhas
     public static int line = 1;
+    public static String lineDetails = "";
     // caracter atual do arquivo fonte
     private char ch = ' ';
     private FileReader file;
@@ -47,6 +48,7 @@ public class Lexer {
     // lê o próximo caracter
     private void readch() throws IOException {
         ch = (char) file.read();
+        lineDetails += ch;
     }
 
     // lê o próximo caracter e verifica se é igual a c
@@ -87,7 +89,10 @@ public class Lexer {
                 else return Word.div;
                 continue;
             }
-            else if(ch == '\n') line++; // conta linha
+            else if(ch == '\n') {
+                line++; // conta linha
+                lineDetails = "";
+            }
             else break;
         }
 

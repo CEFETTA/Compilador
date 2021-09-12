@@ -16,13 +16,17 @@ public class Semantic {
         this.memory = new Memory();
     }
 
+    public void error(String rule) {
+        System.out.println("Erro Semântico (linha "+ this.lex.line +"): " + rule + "\ndetalhes: " + this.lex.lineDetails);
+        System.exit(1);
+    }
+
     public void addId(Id identifier) throws Exception {
         if(!memory.hasId(identifier.name)){
             memory.addItem(identifier);
         }
         else {
-            System.out.println("Erro Semântico: Identificador '"+identifier.name+"' já foi declarado");
-            System.exit(1);
+            this.error("Identificador '"+identifier.name+"' já foi declarado");
         }
     }
 
@@ -30,99 +34,31 @@ public class Semantic {
         if(memory.hasId(id)){
             return memory.getValue(id);
         }
-        System.out.println("Erro Semântico: Identificador '"+id+"' não foi declarado");
-        System.exit(1);
+        this.error("Identificador '"+id+"' não foi declarado");
         return null;
     }
 
-    // !
-    public Const opNot(Const c){
-        if(c.type == Type.BOOL){
-            return new Const(!((boolean) c.value), c.type);
-        }
-
-        System.out.println("Erro Semântico: Só é possível utilizar o operador de negação em expressões booleanas!");
-        System.exit(1);
-        return null;
+    public Type getIdentifierType(String id) {
+        Const value = this.getValue(id);
+        return value.type;
     }
 
-    // -
-    public Const opMinus(Const c){
-        if(c.type == Type.INT){
-            return new Const(-((int) c.value), c.type);
-        }
-        if(c.type == Type.FLOAT){
-            return new Const(-((float) c.value), c.type);
-        }
-        System.out.println("Erro Semântico: Só é possível utilizar o operador de menos em inteiros ou reais!");
-        System.exit(1);
-        return null;
+    public void checkIdentifierCompatibility(String id, Type expectedType) {
+        Type idType = this.getIdentifierType(id);
+        this.checkIsTypeCompatible(expectedType, idType);
     }
 
-    // mulop
-    public Const opMulop(Const factor, Const mulfactor, int t){
-        if(factor.type == mulfactor.type){
-            if(factor.type == Type.BOOL && t != Tag.AND){
-                System.out.println("Erro Semântico: booleano não é compatível com o operador!");
-                System.exit(1);
-            }
-            if(factor.type != Type.BOOL && t == Tag.AND){
-                System.out.println("Erro Semântico: and só é compatível com o booleano!");
-                System.exit(1);
-            }
-            if(!isNumber(factor)){
-                System.out.println("Erro Semântico: Operador válido apenas para números!");
-                System.exit(1);
-            }
-
-            return new Const(factor.value, factor.type);
+    public void checkIsTypeCompatible(Type assignedType, Type expressionType) {
+        if (
+                assignedType == Type.ANY
+                || expressionType == Type.ANY
+                || assignedType == expressionType
+        ) {
+            return;
         }
-
-        System.out.println("Erro Semântico: não foi possível executar a operação "+t+" com ' "+factor.type+" and "+mulfactor.type+"'!");
-        System.exit(1);
-        return null;
-    }
-
-    public Const opSimpleExpr(Const term, Const addTerm, int t){
-        if(term.type == addTerm.type){
-            if(term.type == Type.STRING && t != Tag.ADD){
-                System.out.println("Erro Semântico: string não é compatível com o operador!");
-                System.exit(1);
-            }
-            if(term.type == Type.BOOL && t != Tag.OR){
-                System.out.println("Erro Semântico: booleano não é compatível com o operador!");
-                System.exit(1);
-            }
-            if(term.type != Type.BOOL && t == Tag.OR){
-                System.out.println("Erro Semântico: or só é compatível com o booleano!");
-                System.exit(1);
-            }
-            if(!isNumber(term) && t != Tag.SUB){
-                System.out.println("Erro Semântico: Operador válido apenas para números!");
-                System.exit(1);
-            }
-
-            return new Const(term.value, term.type);
+        if (assignedType == Type.FLOAT && expressionType == Type.INT) {
+            return;
         }
-
-        System.out.println("Erro Semântico: não foi possível executar a operação "+t+" com ' "+addTerm.type+" and "+term.type+"'!");
-        System.exit(1);
-        return null;
-    }
-
-    public Const opRelop(Const expression, Const operationExp, int t){
-        if(expression.type == operationExp.type){
-            return new Const(expression.value, expression.type);
-        }
-        if(expression.type == Type.FLOAT && isNumber(operationExp)){
-            return new Const(expression.value, expression.type);
-        }
-        System.out.println("Erro Semântico: não foi possível executar a operação "+t+" com ' "+expression.type+" and "+operationExp.type+"', são tipos diferentes!");
-        System.exit(1);
-        return null;
-    }
-
-    private static boolean isNumber(Const c){
-        return  c.type == Type.FLOAT || c.type == Type.INT;
+        this.error("O tipo utilizado na operação " + expressionType + " não é compatível com o tipo da atribuição " + assignedType);
     }
 }

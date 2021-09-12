@@ -1,4 +1,4 @@
-classe Teste7
+class Teste7
 
 int num;
 
@@ -7,5 +7,5 @@ init
     read(num);
 
     write("O valor digitado foi: ");
-    read(stop);
+    write(num);
 stop

@@ -1,16 +1,17 @@
 class Teste2
 /* Teste de comentário
-com mais de uma linha
+com mais de uma linha */
 
-a, 9valor, b_1, b_2 : int;
+int a, valor, b_1;
+float b_2; // corrigido: b_2 precisa ser float pois é atribuído a ele o resultado de uma divisão
 
 init
     write("Entre com o valor de a: ");
     read (a);
-    b_1 := a * a;
+    b_1 = a * a;
     write("O valor de b1 e: ");
     write (b_1);
-    b_2 = b + a/2 * (a + 5);
+    b_2 = b_1 + a/2 * (a + 5); // corrigido: b não declarado ; b_2 não pode ser int pois ocorre uma divisão de inteiros
     write("O valor de b2 e: ");
-    Write (b2);
+    write(b_2); // corrigido: write não declarado ; b2 não declarado
 stop

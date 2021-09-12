@@ -1,16 +1,16 @@
-classe Teste3
-
-/** Verificando fluxo de controle
-Programa com if e while aninhados **/
+class Teste3
 
 int i;
-int media, soma;
+int soma;
+float media; // corrigido: operação de divisão retorna sempre float
+int qtd; // corrigido: erro 'qtd' não declarado
+int altura; // corrigido erro 'altura' não declarado
 
-INIT
+init
     soma = 0;
-    write("Quantos dados deseja informar?" );
-    read (qtd);
-    if (qtd>=2){
+    write("Quantos dados deseja informar?");
+    read(qtd);
+    if (qtd >= 2){
         i=0;
         do{
             write("Altura: ");
@@ -24,5 +24,5 @@ INIT
     }
     else{
         write("Quantidade inválida.");
-    }
+    };
 stop

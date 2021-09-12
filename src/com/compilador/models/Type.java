@@ -4,5 +4,7 @@ public enum Type {
     INT,
     FLOAT,
     STRING,
-    BOOL
+    BOOL,
+    ERR,
+    ANY
 }

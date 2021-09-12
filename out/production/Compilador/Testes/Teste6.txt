@@ -1,4 +1,4 @@
-classe Teste6
+class Teste6
 
 /** Verificando fluxo de controle
 Programa com while aninhados **/
@@ -11,15 +11,15 @@ init
     read(qtd);
     i = 0;
 
-    while(i < qtd){
+    do {
         j = 0;
-        while(j < qtd) {
+        do {
             valor = j * 5;
             j = j + 1;
-        }
+        } while(j < qtd);
 
         i = i + 1;
-    }
+    } while(i < qtd);
 
     write("O calculo resultou em: ");
     write(valor);
