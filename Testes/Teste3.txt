@@ -1,16 +1,16 @@
 class Teste3
 
-int i;
-int soma;
-float media; // corrigido: operação de divisão retorna sempre float
-int qtd; // corrigido: erro 'qtd' não declarado
-int altura; // corrigido erro 'altura' não declarado
+/** Verificando fluxo de controle
+Programa com if e while aninhados **/
+
+int i, qtd;
+float media, soma, altura;
 
 init
     soma = 0;
-    write("Quantos dados deseja informar?");
-    read(qtd);
-    if (qtd >= 2){
+    write("Quantos dados deseja informar?" );
+    read (qtd);
+    if (qtd>=2){
         i=0;
         do{
             write("Altura: ");

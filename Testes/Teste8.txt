@@ -5,9 +5,11 @@ float floating;
 string text;
 
 init
-    //integer = floating; // ERRO: FLOAT não compatível com INT
-    //floating = text; // ERRO: STRING não compatível com FLOAT
-    //text = integer; // ERRO: INT não compatível com STRING
-    //integer = integer && integer; // ERRO: BOOL utilizado na operação com é compatível com INT
-    write("Descomente as linhas acima para ver os erros de análise semântica");
+    integer = 10;
+    floating = 2.18;
+    text = "text";
+    integer = integer + integer;
+    write("Programa do teste 8.");
 stop
+
+
