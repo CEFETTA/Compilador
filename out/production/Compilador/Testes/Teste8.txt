@@ -1,0 +1,13 @@
+class Teste8
+
+int integer;
+float floating;
+string text;
+
+init
+    integer = 10;
+    floating = 2.18;
+    text = "text";
+    integer = integer + integer;
+    write("Programa do teste 8.");
+stop
